@@ -1,10 +1,9 @@
-import makeWASocket, { useMultiFileAuthState } from '@whiskeysockets/baileys'
+import makeWASocket, { DisconnectReason } from '@whiskeysockets/baileys'
 import P from 'pino'
 import QRCode from 'qrcode'
 
 async function startBot() {
     // Gestion de l'authentification (stockée dans un dossier)
-    const { state, saveCreds } = await useMultiFileAuthState('auth_info')
 
     // Création du socket
     const sock = makeWASocket({
@@ -24,8 +23,7 @@ async function startBot() {
         if (connection === 'open') {
             console.log('✅ Connecté à WhatsApp')
         } else if (connection === 'close') {
-            console.log('❌ Connexion fermée, tentative de reconnexion...')
-            startBot() // relance automatique
+            console.log('❌ Connexion fermée....')
         }
     })
 
@@ -42,10 +40,10 @@ async function startBot() {
 
     //reconnection avecles identifiants
     sock.ev.on('connection.update', (update) => {
-        const { connection,lastDisconnect,  } = update  
-        /*if(connection === 'close' &&(lastDisconnect?.error as Boom )?.output?.statusCode === DisconnectReason.restartRequired){
+        const { connection, lastDisconnect} = update  
+        if(connection === 'close' && (lastDisconnect?.error )?.output?.statusCode === DisconnectReason.restartRequired){
             
-        }*/
+        }
     })
 
 }
